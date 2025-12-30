@@ -1,14 +1,24 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "../redux/CartSlice";
-import "./ProductList.css";
 import CartItem from "./CartItem";
+import "./ProductList.css";
 
 function ProductList({ onHomeClick }) {
   const dispatch = useDispatch();
 
+  // Get cart items from Redux store
+  const cartItems = useSelector((state) => state.cart.items);
+
   const [showCart, setShowCart] = useState(false);
   const [addedToCart, setAddedToCart] = useState({});
+
+  // Calculate total quantity for cart icon
+  const calculateTotalQuantity = () => {
+    return cartItems
+      ? cartItems.reduce((total, item) => total + item.quantity, 0)
+      : 0;
+  };
 
   const plantsArray = [
     {
@@ -38,25 +48,6 @@ function ProductList({ onHomeClick }) {
       ],
     },
     {
-      category: "Aromatic Fragrant Plants",
-      plants: [
-        {
-          name: "Lavender",
-          image:
-            "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba",
-          description: "Calming scent, used in aromatherapy.",
-          cost: "$20",
-        },
-        {
-          name: "Mint",
-          image:
-            "https://cdn.pixabay.com/photo/2016/01/07/18/16/mint-1126282_1280.jpg",
-          description: "Refreshing aroma, used in teas and cooking.",
-          cost: "$12",
-        },
-      ],
-    },
-    {
       category: "Medicinal Plants",
       plants: [
         {
@@ -77,6 +68,7 @@ function ProductList({ onHomeClick }) {
     },
   ];
 
+  // Add to cart handler
   const handleAddToCart = (plant) => {
     dispatch(addItem(plant));
     setAddedToCart((prev) => ({
@@ -98,10 +90,13 @@ function ProductList({ onHomeClick }) {
     <div>
       {/* NAVBAR */}
       <div className="navbar">
-        <h2 onClick={onHomeClick} style={{ cursor: "pointer" }}>
+        <h2 style={{ cursor: "pointer" }} onClick={onHomeClick}>
           Paradise Nursery
         </h2>
-        <button onClick={handleCartClick}>🛒 Cart</button>
+
+        <button onClick={handleCartClick} className="cart-btn">
+          🛒 Cart ({calculateTotalQuantity()})
+        </button>
       </div>
 
       {/* PRODUCT LIST OR CART */}
